@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import bleach
+import logging
 import os
 import random
 import re
@@ -12,6 +13,9 @@ from dataclasses import dataclass, field
 from fpdf import FPDF
 from docx import Document
 from io import BytesIO
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
 
 @dataclass
 class DocumentData:
@@ -58,6 +62,8 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
+app.config['MAX_CONTENT_LENGTH'] = 512 * 1024
+
 DOCUMENT_EXPIRY = int(os.environ.get('DOCUMENT_EXPIRY', 600))
 STORAGE_LIMIT = int(os.environ.get('STORAGE_LIMIT', 1000))
 
@@ -103,6 +109,12 @@ def _sanitize_html(html: str) -> str:
     return bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)
 
 
+@app.before_request
+def log_request():
+    if request.path != '/health':
+        logger.info('%s %s from %s', request.method, request.path, request.remote_addr)
+
+
 @app.after_request
 def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -111,6 +123,27 @@ def add_security_headers(response):
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
     return response
+
+
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({"success": False, "error": "Bad request"}), 400
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({"success": False, "error": "Not found"}), 404
+
+
+@app.errorhandler(429)
+def ratelimit_error(error):
+    return jsonify({"success": False, "error": "Too many requests, slow down"}), 429
+
+
+@app.errorhandler(500)
+def server_error(error):
+    logger.exception('Internal server error')
+    return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
 @app.route('/health', methods=['GET'])
