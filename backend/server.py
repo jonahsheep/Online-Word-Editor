@@ -4,7 +4,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import bleach
 import logging
-import os
 import random
 import re
 import time
@@ -13,6 +12,8 @@ from dataclasses import dataclass, field
 from fpdf import FPDF
 from docx import Document
 from io import BytesIO
+
+from config import Config
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ ALLOWED_ATTRS = {
 }
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": os.environ.get('CORS_ORIGINS', '*')}})
+CORS(app, resources={r"/*": {"origins": Config.CORS_ORIGINS}})
 
 limiter = Limiter(
     get_remote_address,
@@ -62,10 +63,10 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-app.config['MAX_CONTENT_LENGTH'] = 512 * 1024
+app.config['MAX_CONTENT_LENGTH'] = Config.MAX_CONTENT_LENGTH
 
-DOCUMENT_EXPIRY = int(os.environ.get('DOCUMENT_EXPIRY', 600))
-STORAGE_LIMIT = int(os.environ.get('STORAGE_LIMIT', 1000))
+DOCUMENT_EXPIRY = Config.DOCUMENT_EXPIRY
+STORAGE_LIMIT = Config.STORAGE_LIMIT
 
 storage_lock = threading.Lock()
 storage: dict[str, DocumentData] = {}
@@ -276,5 +277,4 @@ def download_document(fmt):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=Config.PORT)
