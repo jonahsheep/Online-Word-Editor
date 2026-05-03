@@ -1,5 +1,8 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import bleach
 import os
 import random
 import re
@@ -33,8 +36,27 @@ class DocumentData:
         return time.time() - self.updated_at > max_age
 
 
+ALLOWED_TAGS = [
+    'p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3',
+    'ol', 'ul', 'li', 'a', 'img', 'span', 'div',
+    'blockquote', 'pre', 'code', 'sub', 'sup'
+]
+ALLOWED_ATTRS = {
+    'a': ['href', 'target', 'rel'],
+    'img': ['src', 'alt', 'width', 'height'],
+    'span': ['style'],
+    '*': ['class'],
+}
+
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": os.environ.get('CORS_ORIGINS', '*')}})
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per minute", "50 per minute"],
+    storage_uri="memory://",
+)
 
 DOCUMENT_EXPIRY = int(os.environ.get('DOCUMENT_EXPIRY', 600))
 STORAGE_LIMIT = int(os.environ.get('STORAGE_LIMIT', 1000))
@@ -77,6 +99,20 @@ cleanup_thread = threading.Thread(target=_background_cleanup, daemon=True)
 cleanup_thread.start()
 
 
+def _sanitize_html(html: str) -> str:
+    return bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)
+
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '0'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
+    return response
+
+
 @app.route('/health', methods=['GET'])
 def health_check():
     with storage_lock:
@@ -103,6 +139,7 @@ def save_document():
     if len(text) > 500_000:
         return jsonify({"success": False, "error": "Document too large (max 500KB)"}), 413
 
+    text = _sanitize_html(text)
     pin = data.get("pin", "")
 
     with storage_lock:
