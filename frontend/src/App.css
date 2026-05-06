@@ -200,4 +200,42 @@ input[type="text"]:focus {
 .save-button:hover {
   background-color: #1557b0;
 }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 2000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease;
+}
+
+.toast-info {
+  background-color: #1a73e8;
+}
+
+.toast-success {
+  background-color: #34a853;
+}
+
+.toast-error {
+  background-color: #ea4335;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
   
