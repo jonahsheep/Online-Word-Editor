@@ -1,10 +1,48 @@
+:root {
+  --bg-page: #f8f9fa;
+  --bg-surface: #ffffff;
+  --bg-toolbar: #f8f9fa;
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --border-color: #dadce0;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --blue: #1a73e8;
+  --blue-hover: #1557b0;
+  --green: #34a853;
+  --green-hover: #2d8e47;
+  --red: #ea4335;
+}
+
+[data-theme="dark"] {
+  --bg-page: #1a1a2e;
+  --bg-surface: #16213e;
+  --bg-toolbar: #1a1a2e;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --border-color: #3c4043;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --blue: #4a8af4;
+  --blue-hover: #3b7de6;
+  --green: #3ddc84;
+  --green-hover: #33c776;
+  --red: #f28b82;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-page);
+  transition: background-color 0.3s, color 0.3s;
+}
+
 .App {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Google Sans', Arial, sans-serif;
-  background-color: #f8f9fa;
+  background-color: var(--bg-page);
   min-height: 100vh;
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .editor-header {
@@ -12,15 +50,16 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: white;
-  border-bottom: 1px solid #dadce0;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 20px;
   border-radius: 8px 8px 0 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s;
 }
 
 h1 {
-  color: #202124;
+  color: var(--text-primary);
   font-size: 22px;
   font-weight: 500;
   margin: 0;
@@ -33,7 +72,7 @@ h1 {
 }
 
 button {
-  background-color: #1a73e8;
+  background-color: var(--blue);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -47,19 +86,35 @@ button {
 }
 
 button:hover {
-  background-color: #1557b0;
+  background-color: var(--blue-hover);
 }
 
 button:disabled {
-  background-color: #dadce0;
+  background-color: var(--border-color);
   cursor: not-allowed;
 }
 
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  font-size: 18px;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.theme-toggle:hover {
+  background-color: var(--bg-toolbar);
+}
+
 .editor-container {
-  background: white;
+  background: var(--bg-surface);
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   margin-bottom: 30px;
+  transition: background-color 0.3s;
 }
 
 .ql-container {
@@ -76,23 +131,39 @@ button:disabled {
 }
 
 .ql-toolbar {
-  border-bottom: 1px solid #dadce0;
-  background-color: #f8f9fa;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-toolbar);
   border-radius: 8px 8px 0 0;
 }
 
 .ql-toolbar.ql-snow {
-  border-color: #dadce0;
+  border-color: var(--border-color);
 }
 
 .ql-container.ql-snow {
-  border-color: #dadce0;
+  border-color: var(--border-color);
 }
 
 .ql-editor img {
   max-width: 100%;
   height: auto;
   margin: 10px 0;
+}
+
+[data-theme="dark"] .ql-toolbar.ql-snow .ql-stroke {
+  stroke: #e8eaed;
+}
+
+[data-theme="dark"] .ql-toolbar.ql-snow .ql-fill {
+  fill: #e8eaed;
+}
+
+[data-theme="dark"] .ql-toolbar.ql-snow .ql-picker-label {
+  color: #e8eaed;
+}
+
+[data-theme="dark"] .ql-editor.ql-blank::before {
+  color: #9aa0a6;
 }
 
 .controls {
@@ -104,16 +175,19 @@ button:disabled {
 
 input[type="text"] {
   padding: 8px 12px;
-  border: 1px solid #dadce0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   margin-right: 10px;
   font-size: 14px;
   width: 120px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 input[type="text"]:focus {
   outline: none;
-  border-color: #1a73e8;
+  border-color: var(--blue);
   box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
 }
 
@@ -131,51 +205,54 @@ input[type="text"]:focus {
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-surface);
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   max-width: 400px;
   width: 90%;
+  transition: background-color 0.3s;
 }
 
 .pin-display {
   font-size: 32px;
   font-weight: bold;
-  color: #1a73e8;
+  color: var(--blue);
   margin: 20px 0;
   letter-spacing: 4px;
   font-family: monospace;
 }
 
 .pin-expiry {
-  color: #5f6368;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 10px 0;
 }
 
 .retrieve-section {
-  background: white;
+  background: var(--bg-surface);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   margin-top: 20px;
+  transition: background-color 0.3s;
 }
 
 .retrieve-section h3 {
-  color: #202124;
+  color: var(--text-primary);
   margin: 0 0 15px 0;
   font-size: 16px;
   font-weight: 500;
 }
 
 .retrieved-content {
-  background: white;
+  background: var(--bg-surface);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   margin-top: 20px;
+  transition: background-color 0.3s;
 }
 
 .download-buttons {
@@ -184,21 +261,21 @@ input[type="text"]:focus {
 }
 
 .download-buttons button {
-  background-color: #34a853;
+  background-color: var(--green);
   padding: 6px 12px;
   font-size: 13px;
 }
 
 .download-buttons button:hover {
-  background-color: #2d8e47;
+  background-color: var(--green-hover);
 }
 
 .save-button {
-  background-color: #1a73e8;
+  background-color: var(--blue);
 }
 
 .save-button:hover {
-  background-color: #1557b0;
+  background-color: var(--blue-hover);
 }
 
 .toast {
@@ -217,15 +294,15 @@ input[type="text"]:focus {
 }
 
 .toast-info {
-  background-color: #1a73e8;
+  background-color: var(--blue);
 }
 
 .toast-success {
-  background-color: #34a853;
+  background-color: var(--green);
 }
 
 .toast-error {
-  background-color: #ea4335;
+  background-color: var(--red);
 }
 
 @keyframes slideIn {
@@ -238,4 +315,3 @@ input[type="text"]:focus {
     opacity: 1;
   }
 }
-  

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from "react";
 import axios from "axios";
 import "./App.css";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import RichTextEditor from "./components/RichTextEditor";
 import EditorToolbar from "./components/EditorToolbar";
 import PinModal from "./components/PinModal";
@@ -9,7 +10,7 @@ import Toast from "./components/Toast";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-function App() {
+function AppContent() {
   const [text, setText] = useState("");
   const [pin, setPin] = useState("");
   const [retrievePin, setRetrievePin] = useState("");
@@ -20,6 +21,7 @@ function App() {
   const [showPinModal, setShowPinModal] = useState(false);
   const [toast, setToast] = useState(null);
   const quillRef = useRef(null);
+  const { dark, toggleTheme } = useTheme();
 
   const showToast = useCallback((message, type = "info") => {
     setToast({ message, type, key: Date.now() });
@@ -98,12 +100,21 @@ function App() {
     <div className="App">
       <div className="editor-header">
         <h1>Online Word Editor</h1>
-        <EditorToolbar
-          onSave={handleSave}
-          onDownload={handleDownload}
-          isSaving={isSaving}
-          hasText={!!text.trim()}
-        />
+        <div className="header-buttons">
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            title={dark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {dark ? "\u2600" : "\u263E"}
+          </button>
+          <EditorToolbar
+            onSave={handleSave}
+            onDownload={handleDownload}
+            isSaving={isSaving}
+            hasText={!!text.trim()}
+          />
+        </div>
       </div>
 
       <div className="editor-container">
@@ -139,6 +150,14 @@ function App() {
         />
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
