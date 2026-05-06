@@ -315,3 +315,77 @@ input[type="text"]:focus {
     opacity: 1;
   }
 }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.skeleton {
+  background: var(--border-color);
+  border-radius: 4px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-editor {
+  height: 500px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  .editor-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .header-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .ql-editor {
+    padding: 20px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .controls input {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .controls button {
+    width: 100%;
+  }
+
+  .download-buttons {
+    justify-content: center;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-buttons button {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .pin-display {
+    font-size: 24px;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+}
