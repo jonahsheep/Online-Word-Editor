@@ -1,6 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 
-function EditorToolbar({ onSave, onDownload, isSaving, hasText }) {
+const EditorToolbar = memo(function EditorToolbar({ onSave, onDownload, isSaving, hasText }) {
   return (
     <div className="header-buttons">
       <button
@@ -20,6 +20,6 @@ function EditorToolbar({ onSave, onDownload, isSaving, hasText }) {
       </div>
     </div>
   );
-}
+});
 
 export default EditorToolbar;

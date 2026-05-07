@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 
-function Toast({ message, type = "info", onClose, duration = 3000 }) {
+const Toast = memo(function Toast({ message, type = "info", onClose, duration = 3000 }) {
   useEffect(() => {
     const timer = setTimeout(onClose, duration);
     return () => clearTimeout(timer);
@@ -11,6 +11,6 @@ function Toast({ message, type = "info", onClose, duration = 3000 }) {
       <span className="toast-message">{message}</span>
     </div>
   );
-}
+});
 
 export default Toast;

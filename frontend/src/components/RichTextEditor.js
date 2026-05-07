@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, forwardRef } from "react";
+import React, { memo, useRef, useEffect, forwardRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -13,7 +13,7 @@ const modules = {
   ],
 };
 
-const RichTextEditor = forwardRef(function RichTextEditor({ value, onChange }, ref) {
+const RichTextEditor = memo(forwardRef(function RichTextEditor({ value, onChange }, ref) {
   const innerRef = useRef(null);
 
   useEffect(() => {
@@ -48,6 +48,6 @@ const RichTextEditor = forwardRef(function RichTextEditor({ value, onChange }, r
       modules={modules}
     />
   );
-});
+}));
 
 export default RichTextEditor;

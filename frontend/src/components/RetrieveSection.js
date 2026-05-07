@@ -1,6 +1,12 @@
-import React from "react";
+import React, { memo } from "react";
 
-function RetrieveSection({ pin, onPinChange, onRetrieve, isRetrieving, retrievedText }) {
+const RetrieveSection = memo(function RetrieveSection({
+  pin,
+  onPinChange,
+  onRetrieve,
+  isRetrieving,
+  retrievedText,
+}) {
   return (
     <div className="retrieve-section">
       <h3>Access Document</h3>
@@ -25,6 +31,6 @@ function RetrieveSection({ pin, onPinChange, onRetrieve, isRetrieving, retrieved
       )}
     </div>
   );
-}
+});
 
 export default RetrieveSection;

@@ -67,7 +67,7 @@ function AppContent() {
     setDirty(true);
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!text.trim()) {
       showToast("Please enter some text before saving", "error");
       return;
@@ -93,9 +93,9 @@ function AppContent() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [text, pin, showToast]);
 
-  const handleRetrieve = async () => {
+  const handleRetrieve = useCallback(async () => {
     if (!retrievePin) {
       showToast("Please enter a PIN", "error");
       return;
@@ -115,9 +115,9 @@ function AppContent() {
     } finally {
       setIsRetrieving(false);
     }
-  };
+  }, [retrievePin, showToast]);
 
-  const handleDownload = async (format) => {
+  const handleDownload = useCallback(async (format) => {
     if (!text.trim()) {
       showToast("Please enter some text before downloading", "error");
       return;
@@ -139,7 +139,7 @@ function AppContent() {
     } catch (error) {
       showToast(`Failed to download as ${format}`, "error");
     }
-  };
+  }, [text, showToast]);
 
   return (
     <div className="App">

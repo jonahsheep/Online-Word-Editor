@@ -1,6 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 
-function PinModal({ pin, expiryTime, onClose }) {
+const PinModal = memo(function PinModal({ pin, expiryTime, onClose }) {
   if (!pin) return null;
 
   return (
@@ -18,6 +18,6 @@ function PinModal({ pin, expiryTime, onClose }) {
       </div>
     </div>
   );
-}
+});
 
 export default PinModal;
