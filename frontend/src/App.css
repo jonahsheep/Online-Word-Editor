@@ -65,6 +65,30 @@ h1 {
   margin: 0;
 }
 
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.save-status {
+  font-size: 12px;
+  font-weight: 400;
+  transition: color 0.3s;
+}
+
+.save-status-saved {
+  color: var(--green);
+}
+
+.save-status-unsaved {
+  color: var(--red);
+}
+
+.save-status-saving {
+  color: var(--blue);
+}
+
 .header-buttons {
   display: flex;
   gap: 10px;
@@ -342,6 +366,12 @@ input[type="text"]:focus {
     gap: 10px;
     align-items: stretch;
     text-align: center;
+  }
+
+  .header-left {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
   }
 
   .header-buttons {

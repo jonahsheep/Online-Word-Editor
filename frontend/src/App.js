@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
@@ -9,6 +9,7 @@ import RetrieveSection from "./components/RetrieveSection";
 import Toast from "./components/Toast";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const AUTOSAVE_DELAY = 30000;
 
 function AppContent() {
   const [text, setText] = useState("");
@@ -20,11 +21,50 @@ function AppContent() {
   const [pinExpiry, setPinExpiry] = useState(null);
   const [showPinModal, setShowPinModal] = useState(false);
   const [toast, setToast] = useState(null);
+  const [dirty, setDirty] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("saved");
   const quillRef = useRef(null);
+  const timerRef = useRef(null);
+  const currentPinRef = useRef(pin);
   const { dark, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    currentPinRef.current = pin;
+  }, [pin]);
+
+  useEffect(() => {
+    if (dirty) {
+      setSaveStatus("unsaved");
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        doAutoSave();
+      }, AUTOSAVE_DELAY);
+    }
+    return () => clearTimeout(timerRef.current);
+  }, [text, dirty]);
+
+  const doAutoSave = async () => {
+    if (!text.trim()) return;
+    setSaveStatus("saving");
+    try {
+      await axios.post(`${API_URL}/save`, {
+        text,
+        pin: currentPinRef.current || undefined,
+      });
+      setSaveStatus("saved");
+      setDirty(false);
+    } catch {
+      setSaveStatus("unsaved");
+    }
+  };
 
   const showToast = useCallback((message, type = "info") => {
     setToast({ message, type, key: Date.now() });
+  }, []);
+
+  const handleTextChange = useCallback((value) => {
+    setText(value);
+    setDirty(true);
   }, []);
 
   const handleSave = async () => {
@@ -40,12 +80,15 @@ function AppContent() {
         pin: pin || undefined,
       });
       setPin(response.data.code);
+      currentPinRef.current = response.data.code;
       setPinExpiry(expiryTime);
       setShowPinModal(true);
+      setDirty(false);
+      setSaveStatus("saved");
       showToast("Document saved!", "success");
     } catch (error) {
       const msg =
-        error.response?.data?.error || "Failed to save document. Please try again.";
+        error.response?.data?.error || "Failed to save document.";
       showToast(msg, "error");
     } finally {
       setIsSaving(false);
@@ -62,6 +105,8 @@ function AppContent() {
       const response = await axios.get(`${API_URL}/retrieve/${retrievePin}`);
       setRetrievedText(response.data.text);
       setText(response.data.text);
+      setDirty(false);
+      setSaveStatus("saved");
       showToast("Document retrieved!", "success");
     } catch (error) {
       const msg =
@@ -99,7 +144,14 @@ function AppContent() {
   return (
     <div className="App">
       <div className="editor-header">
-        <h1>Online Word Editor</h1>
+        <div className="header-left">
+          <h1>Online Word Editor</h1>
+          <span className={`save-status save-status-${saveStatus}`}>
+            {saveStatus === "saving" ? "Saving..." : ""}
+            {saveStatus === "unsaved" ? "Unsaved changes" : ""}
+            {saveStatus === "saved" && dirty === false ? "All changes saved" : ""}
+          </span>
+        </div>
         <div className="header-buttons">
           <button
             className="theme-toggle"
@@ -121,7 +173,7 @@ function AppContent() {
         <RichTextEditor
           ref={quillRef}
           value={text}
-          onChange={setText}
+          onChange={handleTextChange}
         />
       </div>
 
