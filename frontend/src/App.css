@@ -371,6 +371,52 @@ input[type="text"]:focus {
   }
 }
 
+.recent-pins {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.recent-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.recent-pin-btn {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--blue);
+  padding: 4px 10px;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.recent-pin-btn:hover {
+  background-color: var(--bg-toolbar);
+  border-color: var(--blue);
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.8; }

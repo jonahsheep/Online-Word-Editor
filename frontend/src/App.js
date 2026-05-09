@@ -23,6 +23,13 @@ function AppContent() {
   const [toast, setToast] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState("saved");
+  const [recentPins, setRecentPins] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("recentPins") || "[]");
+    } catch {
+      return [];
+    }
+  });
   const quillRef = useRef(null);
   const timerRef = useRef(null);
   const currentPinRef = useRef(pin);
@@ -70,6 +77,18 @@ function AppContent() {
     setToast({ message, type, key: Date.now() });
   }, []);
 
+  const saveRecentPin = useCallback((newPin) => {
+    setRecentPins((prev) => {
+      const updated = [newPin, ...prev.filter((p) => p !== newPin)].slice(0, 5);
+      localStorage.setItem("recentPins", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const handleSelectRecentPin = useCallback((p) => {
+    setRetrievePin(p);
+  }, []);
+
   const handleTextChange = useCallback((value) => {
     setText(value);
     setDirty(true);
@@ -87,12 +106,14 @@ function AppContent() {
         text,
         pin: pin || undefined,
       });
-      setPin(response.data.code);
-      currentPinRef.current = response.data.code;
+      const code = response.data.code;
+      setPin(code);
+      currentPinRef.current = code;
       setPinExpiry(expiryTime);
       setShowPinModal(true);
       setDirty(false);
       setSaveStatus("saved");
+      saveRecentPin(code);
       showToast("Document saved!", "success");
     } catch (error) {
       const msg =
@@ -101,7 +122,7 @@ function AppContent() {
     } finally {
       setIsSaving(false);
     }
-  }, [text, pin, showToast]);
+  }, [text, pin, showToast, saveRecentPin]);
 
   const handleRetrieve = useCallback(async () => {
     if (!retrievePin) {
@@ -200,6 +221,8 @@ function AppContent() {
         onRetrieve={handleRetrieve}
         isRetrieving={isRetrieving}
         retrievedText={retrievedText}
+        recentPins={recentPins}
+        onSelectRecent={handleSelectRecentPin}
       />
 
       {toast && (
