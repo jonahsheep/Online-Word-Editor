@@ -248,6 +248,37 @@ input[type="text"]:focus {
   font-family: monospace;
 }
 
+.pin-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.pin-action-btn {
+  background-color: var(--bg-toolbar);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 14px;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.pin-action-btn:hover {
+  background-color: var(--border-color);
+}
+
+.share-btn {
+  background-color: var(--green);
+  color: white;
+  border: none;
+}
+
+.share-btn:hover {
+  background-color: var(--green-hover);
+}
+
 .pin-expiry {
   color: var(--text-secondary);
   font-size: 14px;

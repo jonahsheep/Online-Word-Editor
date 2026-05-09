@@ -33,6 +33,14 @@ function AppContent() {
   }, [pin]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedPin = params.get("pin");
+    if (sharedPin && /^\d{4}$/.test(sharedPin)) {
+      setRetrievePin(sharedPin);
+    }
+  }, []);
+
+  useEffect(() => {
     if (dirty) {
       setSaveStatus("unsaved");
       clearTimeout(timerRef.current);
@@ -182,6 +190,7 @@ function AppContent() {
           pin={pin}
           expiryTime={pinExpiry}
           onClose={() => setShowPinModal(false)}
+          showToast={showToast}
         />
       )}
 
