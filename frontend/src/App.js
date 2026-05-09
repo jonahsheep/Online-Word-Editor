@@ -16,6 +16,7 @@ function AppContent() {
   const [pin, setPin] = useState("");
   const [retrievePin, setRetrievePin] = useState("");
   const [retrievedText, setRetrievedText] = useState("");
+  const [retrievedMeta, setRetrievedMeta] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isRetrieving, setIsRetrieving] = useState(false);
   const [pinExpiry, setPinExpiry] = useState(null);
@@ -87,6 +88,14 @@ function AppContent() {
 
   const handleSelectRecentPin = useCallback((p) => {
     setRetrievePin(p);
+    setRetrievedText("");
+    setRetrievedMeta(null);
+  }, []);
+
+  const handleClearRetrieve = useCallback(() => {
+    setRetrievePin("");
+    setRetrievedText("");
+    setRetrievedMeta(null);
   }, []);
 
   const handleTextChange = useCallback((value) => {
@@ -133,6 +142,10 @@ function AppContent() {
     try {
       const response = await axios.get(`${API_URL}/retrieve/${retrievePin}`);
       setRetrievedText(response.data.text);
+      setRetrievedMeta({
+        word_count: response.data.word_count,
+        char_count: response.data.char_count,
+      });
       setText(response.data.text);
       setDirty(false);
       setSaveStatus("saved");
@@ -221,8 +234,10 @@ function AppContent() {
         onRetrieve={handleRetrieve}
         isRetrieving={isRetrieving}
         retrievedText={retrievedText}
+        retrievedMeta={retrievedMeta}
         recentPins={recentPins}
         onSelectRecent={handleSelectRecentPin}
+        onClear={handleClearRetrieve}
       />
 
       {toast && (

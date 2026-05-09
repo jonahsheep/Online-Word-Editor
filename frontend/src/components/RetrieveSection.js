@@ -6,8 +6,10 @@ const RetrieveSection = memo(function RetrieveSection({
   onRetrieve,
   isRetrieving,
   retrievedText,
+  retrievedMeta,
   recentPins,
   onSelectRecent,
+  onClear,
 }) {
   const prevPinLength = useRef(0);
 
@@ -20,7 +22,14 @@ const RetrieveSection = memo(function RetrieveSection({
 
   return (
     <div className="retrieve-section">
-      <h3>Access Document</h3>
+      <div className="retrieve-header">
+        <h3>Access Document</h3>
+        {retrievedText && (
+          <button className="clear-btn" onClick={onClear}>
+            Clear
+          </button>
+        )}
+      </div>
       <div className="controls">
         <input
           type="text"
@@ -52,10 +61,25 @@ const RetrieveSection = memo(function RetrieveSection({
           ))}
         </div>
       )}
-      {retrievedText && (
+      {isRetrieving && (
+        <div className="retrieved-content">
+          <div className="skeleton skeleton-text" />
+          <div className="skeleton skeleton-text short" />
+        </div>
+      )}
+      {retrievedText && !isRetrieving && (
         <div className="retrieved-content">
           <h4>Retrieved Document</h4>
-          <div dangerouslySetInnerHTML={{ __html: retrievedText }} />
+          {retrievedMeta && (
+            <div className="retrieved-meta">
+              <span>{retrievedMeta.word_count} words</span>
+              <span className="meta-sep">&middot;</span>
+              <span>{retrievedMeta.char_count} characters</span>
+            </div>
+          )}
+          <div className="retrieved-body">
+            <div dangerouslySetInnerHTML={{ __html: retrievedText }} />
+          </div>
         </div>
       )}
     </div>
