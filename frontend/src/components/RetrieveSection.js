@@ -10,6 +10,7 @@ const RetrieveSection = memo(function RetrieveSection({
   recentPins,
   onSelectRecent,
   onClear,
+  children,
 }) {
   const prevPinLength = useRef(0);
 
@@ -80,6 +81,7 @@ const RetrieveSection = memo(function RetrieveSection({
           <div className="retrieved-body">
             <div dangerouslySetInnerHTML={{ __html: retrievedText }} />
           </div>
+          {children}
         </div>
       )}
     </div>

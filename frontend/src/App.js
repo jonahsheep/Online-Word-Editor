@@ -6,6 +6,7 @@ import RichTextEditor from "./components/RichTextEditor";
 import EditorToolbar from "./components/EditorToolbar";
 import PinModal from "./components/PinModal";
 import RetrieveSection from "./components/RetrieveSection";
+import VersionHistory from "./components/VersionHistory";
 import Toast from "./components/Toast";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
@@ -17,6 +18,7 @@ function AppContent() {
   const [retrievePin, setRetrievePin] = useState("");
   const [retrievedText, setRetrievedText] = useState("");
   const [retrievedMeta, setRetrievedMeta] = useState(null);
+  const [versions, setVersions] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isRetrieving, setIsRetrieving] = useState(false);
   const [pinExpiry, setPinExpiry] = useState(null);
@@ -96,7 +98,19 @@ function AppContent() {
     setRetrievePin("");
     setRetrievedText("");
     setRetrievedMeta(null);
+    setVersions([]);
   }, []);
+
+  const handleRestoreVersion = useCallback(async (versionIndex) => {
+    try {
+      await axios.post(`${API_URL}/restore/${retrievePin}`, { version: versionIndex });
+      setRetrievedText("");
+      setRetrievePin((prev) => prev);
+      showToast("Version restored! Retrieve the document to see changes.", "success");
+    } catch (error) {
+      showToast("Failed to restore version", "error");
+    }
+  }, [retrievePin, showToast]);
 
   const handleTextChange = useCallback((value) => {
     setText(value);
@@ -150,6 +164,10 @@ function AppContent() {
       setDirty(false);
       setSaveStatus("saved");
       showToast("Document retrieved!", "success");
+      axios
+        .get(`${API_URL}/history/${retrievePin}`)
+        .then((hres) => setVersions(hres.data.versions || []))
+        .catch(() => {});
     } catch (error) {
       const msg =
         error.response?.data?.error || "Failed to retrieve document.";
@@ -238,7 +256,16 @@ function AppContent() {
         recentPins={recentPins}
         onSelectRecent={handleSelectRecentPin}
         onClear={handleClearRetrieve}
-      />
+      >
+        {retrievedText && versions.length > 0 && (
+          <VersionHistory
+            pin={retrievePin}
+            versions={versions}
+            onRestore={handleRestoreVersion}
+            isRetrieving={isRetrieving}
+          />
+        )}
+      </RetrieveSection>
 
       {toast && (
         <Toast

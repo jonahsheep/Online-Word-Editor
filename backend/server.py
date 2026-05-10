@@ -19,12 +19,31 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 @dataclass
+class VersionEntry:
+    text: str
+    saved_at: float = field(default_factory=time.time)
+
+
+@dataclass
 class DocumentData:
     text: str
     pin: str
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
     last_accessed: float = field(default_factory=time.time)
+    versions: list = field(default_factory=list)
+
+    def snapshot(self):
+        self.versions.append(VersionEntry(text=self.text))
+        if len(self.versions) > 5:
+            self.versions.pop(0)
+
+    def restore(self, version_index: int) -> bool:
+        if 0 <= version_index < len(self.versions):
+            self.text = self.versions[version_index].text
+            self.updated_at = time.time()
+            return True
+        return False
 
     @property
     def word_count(self) -> int:
@@ -187,6 +206,7 @@ def save_document():
 
         if pin and pin in storage:
             doc = storage[pin]
+            doc.snapshot()
             doc.text = text
             doc.updated_at = time.time()
             return jsonify({
@@ -229,6 +249,50 @@ def retrieve_document(pin):
             "word_count": doc.word_count,
             "char_count": doc.char_count,
         })
+
+
+@app.route('/history/<pin>', methods=['GET'])
+def get_history(pin):
+    if not pin or not pin.isdigit() or len(pin) != 4:
+        return jsonify({"success": False, "error": "Invalid PIN format"}), 400
+
+    with storage_lock:
+        doc = storage.get(pin)
+        if not doc:
+            return jsonify({"success": False, "error": "Invalid or expired PIN"}), 404
+
+        versions = [
+            {
+                "index": i,
+                "timestamp": v.saved_at,
+                "preview": re.sub('<[^<]+?>', '', v.text)[:100],
+            }
+            for i, v in enumerate(doc.versions)
+        ]
+        return jsonify({"success": True, "versions": versions})
+
+
+@app.route('/restore/<pin>', methods=['POST'])
+def restore_version(pin):
+    if not pin or not pin.isdigit() or len(pin) != 4:
+        return jsonify({"success": False, "error": "Invalid PIN format"}), 400
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"success": False, "error": "Invalid JSON"}), 400
+
+    version_index = data.get("version")
+    if not isinstance(version_index, int):
+        return jsonify({"success": False, "error": "Version index must be an integer"}), 400
+
+    with storage_lock:
+        doc = storage.get(pin)
+        if not doc:
+            return jsonify({"success": False, "error": "Invalid or expired PIN"}), 404
+
+        if doc.restore(version_index):
+            return jsonify({"success": True, "message": "Version restored"})
+        return jsonify({"success": False, "error": "Invalid version index"}), 400
 
 
 @app.route('/download/<fmt>', methods=['POST'])
