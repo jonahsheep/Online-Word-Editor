@@ -2,6 +2,8 @@
 
 A web-based rich text editor with PIN-based document sharing. Built with Flask (backend) and React/ReactQuill (frontend).
 
+**Live app:** [https://online-word-editor-frontend.onrender.com](https://online-word-editor-frontend.onrender.com)
+
 ## Features
 
 - Rich text editing with formatting toolbar (headings, bold, italic, lists, links, images)
