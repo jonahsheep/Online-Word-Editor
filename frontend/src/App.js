@@ -65,10 +65,17 @@ function AppContent() {
     if (!text.trim()) return;
     setSaveStatus("saving");
     try {
-      await axios.post(`${API_URL}/save`, {
+      const res = await axios.post(`${API_URL}/save`, {
         text,
         pin: currentPinRef.current || undefined,
       });
+      const code = res.data.code;
+      if (code && !currentPinRef.current) {
+        setPin(code);
+        currentPinRef.current = code;
+        setPinExpiry(new Date(Date.now() + 10 * 60 * 1000));
+        saveRecentPin(code);
+      }
       setSaveStatus("saved");
       setDirty(false);
     } catch {

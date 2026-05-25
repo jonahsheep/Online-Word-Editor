@@ -55,7 +55,6 @@ class DocumentData:
         text = re.sub('<[^<]+?>', '', self.text)
         return len(text)
 
-    @property
     def is_expired(self, max_age: int = 600) -> bool:
         return time.time() - self.updated_at > max_age
 
@@ -142,6 +141,14 @@ def add_security_headers(response):
     response.headers['X-XSS-Protection'] = '0'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' *;"
+    )
     return response
 
 

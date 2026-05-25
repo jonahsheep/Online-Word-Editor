@@ -226,6 +226,27 @@ input[type="text"]:focus {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
 }
 
 .modal-content {
@@ -237,6 +258,7 @@ input[type="text"]:focus {
   max-width: 400px;
   width: 90%;
   transition: background-color 0.3s;
+  animation: scaleIn 0.2s ease;
 }
 
 .pin-display {
@@ -352,6 +374,7 @@ input[type="text"]:focus {
   border-radius: 4px;
   max-height: 250px;
   overflow-y: auto;
+  animation: slideDown 0.25s ease;
 }
 
 .version-item {
@@ -365,6 +388,14 @@ input[type="text"]:focus {
 
 .version-item:last-child {
   border-bottom: none;
+}
+
+.version-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] .version-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .version-meta {
@@ -441,6 +472,7 @@ input[type="text"]:focus {
   box-shadow: var(--shadow);
   margin-top: 20px;
   transition: background-color 0.3s;
+  animation: fadeIn 0.3s ease;
 }
 
 .download-buttons {
@@ -479,6 +511,10 @@ input[type="text"]:focus {
   z-index: 2000;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   animation: slideIn 0.3s ease;
+}
+
+.toast-exit {
+  animation: slideOut 0.3s ease forwards;
 }
 
 .toast-info {
